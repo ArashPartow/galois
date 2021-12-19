@@ -24,146 +24,157 @@
 #include <vector>
 #include <string.h>
 
-namespace galois
+namespace galois // define the galois namespace for ease of use. No std::
 {
 
 
-   typedef int      GFSymbol;
-   const   GFSymbol GFERROR = -1;
+   typedef int      GFSymbol;       // Decalre a GFSymbol to be an int.
+   const   GFSymbol GFERROR = -1;   // declare the GFERROR variables (for errors I assume.)
 
+   // Class definition constructing Galois Fields.
    class GaloisField
    {
 
       public:
 
        GaloisField();
+
+       // For constructing Galois fields given a polynomial.
        GaloisField(const int  pwr, const unsigned int* primitive_poly);
+
+       // For constructing a Galois extension field.
        GaloisField(const GaloisField& gf);
-      ~GaloisField();
+      ~GaloisField();   // Destructor.
 
-       GaloisField& operator=(const GaloisField& gf);
-       bool operator==(const GaloisField& gf);
+      // For testing equility of fields (isomorphism).
+      GaloisField& operator=(const GaloisField& gf);
+      bool operator==(const GaloisField& gf);
 
+      //returns the idnex of an element int he Galois field.
+      inline GFSymbol index(const GFSymbol value) const
+      {
+         return index_of[value];
+      }
 
-       inline GFSymbol index(const GFSymbol value) const
-       {
-          return index_of[value];
-       }
+      // Calculate the order of an element.
+      inline GFSymbol alpha(const GFSymbol value) const
+      {
+         return alpha_to[value];
+      }
 
-
-       inline GFSymbol alpha(const GFSymbol value) const
-       {
-          return alpha_to[value];
-       }
-
-
-       inline unsigned int size() const
-       {
-          return field_size;
-       }
-
-
-       inline unsigned int pwr() const
-       {
-          return power;
-       }
+      // Find the size of the finite field.
+      inline unsigned int size() const
+      {
+         return field_size;
+      }
 
 
-       inline GFSymbol add(const GFSymbol& a, const GFSymbol& b)
-       {
-          return (a ^ b);
-       }
+      // Get the power of the field.
+      inline unsigned int pwr() const
+      {
+         return power;
+      }
+
+      // Add two elements in the finite field.
+      inline GFSymbol add(const GFSymbol& a, const GFSymbol& b)
+      {
+         return (a ^ b);
+      }
+
+      // Subtract two elements of the field.
+      inline GFSymbol sub(const GFSymbol& a, const GFSymbol& b)
+      {
+         return (a ^ b);
+      }
+
+      // Multiply two elements in the field.
+      inline GFSymbol mul(const GFSymbol& a, const GFSymbol& b)
+      {
+         #if !defined(NO_GFLUT)
+           return mul_table[a][b];
+         #else
+           if ((a == 0) || (b == 0))
+             return 0;
+           else
+             return alpha_to[fast_modulus(index_of[a] + index_of[b])];
+         #endif
+      }
+
+      // Divide two elements in the field.
+      inline GFSymbol div(const GFSymbol& a, const GFSymbol& b)
+      {
+         #if !defined(NO_GFLUT)
+           return div_table[a][b];
+         #else
+           if ((a == 0) || (b == 0))
+             return 0;
+           else
+             return alpha_to[fast_modulus(index_of[a] - index_of[b] + field_size)];
+         #endif
+      }
 
 
-       inline GFSymbol sub(const GFSymbol& a, const GFSymbol& b)
-       {
-          return (a ^ b);
-       }
-
-
-       inline GFSymbol mul(const GFSymbol& a, const GFSymbol& b)
-       {
-          #if !defined(NO_GFLUT)
-            return mul_table[a][b];
-          #else
-            if ((a == 0) || (b == 0))
-              return 0;
-            else
-              return alpha_to[fast_modulus(index_of[a] + index_of[b])];
-          #endif
-       }
-
-
-       inline GFSymbol div(const GFSymbol& a, const GFSymbol& b)
-       {
-          #if !defined(NO_GFLUT)
-            return div_table[a][b];
-          #else
-            if ((a == 0) || (b == 0))
-              return 0;
-            else
-              return alpha_to[fast_modulus(index_of[a] - index_of[b] + field_size)];
-          #endif
-       }
-
-
-       inline GFSymbol exp(const GFSymbol& a, const int& n)
-       {
-          #if !defined(NO_GFLUT)
-            if (n < 0)
-            {
-               int b = n;
-                while(b < 0) b += field_size;// b could be negative
+      inline GFSymbol exp(const GFSymbol& a, const int& n)
+      {
+         #if !defined(NO_GFLUT)
+           if (n < 0)
+           {
+              int b = n;
+               while(b < 0) b += field_size;// b could be negative
 
                if (b == 0)
                  return 1;
                return exp_table[a][b];
-            }
-            else
-              return exp_table[a][n & field_size];
+           }
+           else
+             return exp_table[a][n & field_size];
           #else
-            if (a != 0)
-            {
-               if (n < 0)
-               {
-                  int b = n;
-                  while(b < 0) b += field_size;// b could be negative
-                  if (b == 0)
-                    return 1;
-                  return alpha_to[fast_modulus(index_of[a] * b)];
-               }
-               else if (n == 0)
-                 return 1;
-               else
-                 return alpha_to[fast_modulus(index_of[a] * n)];
-            }
-            else
-              return 0;
+           if (a != 0)
+           {
+              if (n < 0)
+              {
+                 int b = n;
+                 while(b < 0) b += field_size;// b could be negative
+                 if (b == 0)
+                   return 1;
+                 return alpha_to[fast_modulus(index_of[a] * b)];
+              }
+              else if (n == 0)
+                return 1;
+              else
+                return alpha_to[fast_modulus(index_of[a] * n)];
+           }
+           else
+             return 0;
           #endif
-       }
+      }
 
 
-       inline GFSymbol inverse(const GFSymbol& val)
-       {
-          #if !defined(NO_GFLUT)
-            return mul_inverse[val];
-          #else
-            return alpha_to[fast_modulus(field_size - index_of[val])];
-          #endif
-       }
+      inline GFSymbol inverse(const GFSymbol& val)
+      {
+         #if !defined(NO_GFLUT)
+           return mul_inverse[val];
+         #else
+           return alpha_to[fast_modulus(field_size - index_of[val])];
+         #endif
+      }
 
 
-       friend std::ostream& operator << (std::ostream& os, const GaloisField& gf);
+      friend std::ostream& operator << (std::ostream& os, const GaloisField& gf);
 
 
+
+      // Private functions.
       private:
 
+       // Build a finite field using a polynomial.
        void     generate_field(const unsigned int* prim_poly);
-       GFSymbol fast_modulus  (GFSymbol                    x);
+       GFSymbol fast_modulus  (GFSymbol                    x); // modulus?
+
        GFSymbol gen_mul       (const GFSymbol& a, const GFSymbol&     b);
        GFSymbol gen_div       (const GFSymbol& a, const GFSymbol&     b);
        GFSymbol gen_exp       (const GFSymbol& a, const unsigned int& n);
-       GFSymbol gen_inverse   (const GFSymbol& val);
+       GFSymbol gen_inverse   (const GFSymbol& val);    // find inverses?
 
       private:
 

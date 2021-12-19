@@ -53,6 +53,7 @@ namespace galois
        inline GaloisFieldElement& operator=(const GFSymbol& v)
        {
           poly_value  = v & gf->size();
+
           return *this;
        }
 
@@ -60,6 +61,7 @@ namespace galois
        inline GaloisFieldElement& operator+=(const GaloisFieldElement& gfe)
        {
           poly_value ^= gfe.poly_value;
+
           return *this;
        }
 
@@ -74,6 +76,7 @@ namespace galois
        inline GaloisFieldElement& operator-=(const GaloisFieldElement& gfe)
        {
            *this += gfe;
+
            return *this;
        }
 
@@ -81,6 +84,7 @@ namespace galois
        inline GaloisFieldElement& operator-=(const GFSymbol& v)
        {
           *this += v;
+
           return *this;
        }
 

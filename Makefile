@@ -12,7 +12,7 @@
 #
 
 COMPILER         = -c++
-OPTIMIZATION_OPT = -O3
+OPTIMIZATION_OPT = -Og
 OPTIONS          = -pedantic -ansi -Wall -lstdc++ $(OPTIMIZATION_OPT) -o
 OPTIONS_LIBS     = -pedantic -ansi -Wall $(OPTIMIZATION_OPT) -c
 
@@ -29,7 +29,7 @@ OBJECTS = $(CPP_SRC:.cpp=.o)
 	$(COMPILER) $(OPTIONS_LIBS) $*.cpp
 
 
-all: $(OBJECTS) GaloisProto GaloisFieldOut GaloisFieldTest GFPDerivTest GaloisShiftProto
+all: $(OBJECTS) GaloisProto GaloisFieldOut GaloisFieldTest GFPDerivTest GaloisShiftProto poly_roots
 
 GaloisProto: GaloisProto.cpp $(OBJECTS)
 	$(COMPILER) $(OPTIONS) GaloisProto GaloisProto.cpp $(OBJECTS)
@@ -46,5 +46,14 @@ GFPDerivTest: GFPDerivTest.cpp $(OBJECTS)
 GaloisShiftProto: GaloisShiftProto.cpp $(OBJECTS)
 	$(COMPILER) $(OPTIONS) GaloisShiftProto GaloisShiftProto.cpp $(OBJECTS)
 
+GaloisFieldElementTest:
+	g++ -Og -o GaloisFieldElementTest GaloisFieldElementTest.cpp GaloisFieldElement.cpp GaloisField.cpp
+
+GaloisFieldPolynomialTest:
+	g++ -Og -o GaloisFieldPolynomialTest GaloisFieldPolynomialTest.cpp GaloisFieldPolynomial.cpp GaloisField.cpp GaloisFieldElement.cpp
+
+poly_roots:
+	g++ -Og -o poly_roots poly_roots.cpp GaloisFieldPolynomial.cpp GaloisField.cpp GaloisFieldElement.cpp
+
 clean:
-	rm -f core *.o *.bak *stackdump *#
+	rm -f core poly_roots GaloisFieldOut GaloisFieldPolynomialTest GaloisFieldTest GaloisFieldElementTest GaloisProto GaloisShiftProto GFPDerivTest *.o *.bak *stackdump *#

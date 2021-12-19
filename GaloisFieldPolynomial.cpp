@@ -125,7 +125,8 @@ namespace galois
    }
 
 
-   GaloisFieldPolynomial& GaloisFieldPolynomial::operator+=(const GaloisFieldElement& gfe)
+   GaloisFieldPolynomial& GaloisFieldPolynomial::operator+=(const GaloisFieldElement&
+           gfe)
    {
       poly[0] += gfe;
       return *this;
