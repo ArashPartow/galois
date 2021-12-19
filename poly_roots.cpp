@@ -45,7 +45,7 @@ int count_roots(GaloisFieldPolynomial &p, GaloisField &gf, vector<GFSymbol> &roo
 
 int main(int argc, char *argv[]){
     int s = 8; // take 2^s. // upper bound at s=14 (Intel i5-9300H (8) @ 4.1GHz).
-    int t = 8; // inititialize the degree t of x^t+(x+1)^t.
+    int t = 4; // inititialize the degree t of x^t+(x+1)^t.
 
 
 
